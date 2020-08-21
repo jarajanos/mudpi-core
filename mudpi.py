@@ -17,6 +17,7 @@ from workers.camera_worker import CameraWorker
 from workers.trigger_worker import TriggerWorker
 from workers.pi_sensor_worker import PiSensorWorker
 from workers.pi_control_worker import PiControlWorker
+from workers.mqtt_worker import MqttWorker
 try:
 	# Does this prevent the need to install the module if you dont use it?
 	from workers.arduino_worker import ArduinoWorker
@@ -207,6 +208,15 @@ try:
 		print('No Triggers Found to Load')
 		traceback.print_exc()
 
+	# Worker for MQTT
+	try:
+		m = MqttWorker(CONFIGS['mqtt'], main_thread_running, system_ready)
+		print('Loading MQTT...')
+		m = m.run()
+		threads.append(m)
+	except KeyError:
+		print('No MQTT worker settings')
+		traceback.print_exc()
 
 	#Decided not to build server worker (this is replaced with nodejs, expressjs)
 	#Maybe use this for internal communication across devices if using wireless

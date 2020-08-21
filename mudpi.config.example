@@ -150,5 +150,14 @@
             "action": {"event":"Toggle"},
             "topic": "garden/pi/relays/2"
         }
+    ],
+    "mqtt": [
+        {
+            "topic": "garden/pi/mqtt",
+            "broker": "192.168.3.44",
+            "mqtt_topic": "home/irrigation/cmd",
+            "username": "irrigation",
+            "password": "6hFPMBxwQfcZUaNY"
+        }
     ]
 }

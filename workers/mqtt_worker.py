@@ -29,7 +29,7 @@ class MqttWorker:
 
     # Pubsub Listeners
 		self.pubsub = variables.r.pubsub()
-		self.pubsub.subscribe(**{self.topic: self.handleMessage})
+		self.pubsub.subscribe(**{self.topic: self.handlePublish})
 
 		self.init()
 
@@ -47,7 +47,8 @@ class MqttWorker:
     return t
 
   def handlePublish(self, message):
-    pass
+    self.client.publish(self.mqtt_topic, payload=message)
+    print('MQTT Worker...\t\t\t\033[1;32m Publishing message: ' + message + '\033[0;0m')
   
   def handleSubscribe(client, userdata, message):
     pass
