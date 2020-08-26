@@ -19,17 +19,19 @@ class MqttWorker:
     self.system_ready = system_ready
 
     # Config properties
-    self.topic = self.config['topic'].replace(" ", "/").lower() if self.config['topic'] is not None else 'mudpi/mqtt/'
+    self.topic_publish = self.config['pub_topic'].replace(" ", "/").lower() if self.config['pub_topic'] is not None else 'mudpi/control'
+    self.topic_subscribe = self.config['sub_topic'].replace(" ", "/").lower() if self.config['sub_topic'] is not None else 'mudpi/public'
     self.broker = self.config['broker'] if self.config['broker'] is not None else '127.0.0.1'
     self.port = self.config['port'] if self.config['port'] is not None else '1883'
     self.name = self.config['name'] if self.config['name'] is not None else 'MudPi'
-    self.mqtt_topic = self.config['mqtt_topic'] if self.config['mqtt_topic'] is not None else '/'
+    self.mqtt_topic_publish = self.config['mqtt_pub_topic'] if self.config['mqtt_pub_topic'] is not None else 'data'
+    self.mqtt_topic_subscribe = self.config['mqtt_sub_topic'] if self.config['mqtt_sub_topic'] is not None else 'control'
     self.username = self.config['username'] if self.config['username'] is not None else ''
     self.password = self.config['password'] if self.config['password'] is not None else ''
 
     # Pubsub Listeners
 		self.pubsub = variables.r.pubsub()
-		self.pubsub.subscribe(**{self.topic: self.handlePublish})
+		self.pubsub.subscribe(**{self.topic_subscribe: self.handlePublish})
 
 		self.init()
 
@@ -38,7 +40,7 @@ class MqttWorker:
     self.client.username_pw_set(self.username, self.password)
     self.client.on_message = self.handleSubscribe
     self.client.connect(self.broker, self.port, keepalive=60)
-    self.client.subsribe(self.mqtt_topic, 0)
+    self.client.subsribe(self.mqtt_topic_subscribe, 0)
 
   def run(self):
     t = threading.Thread(target=self.work, args=())
