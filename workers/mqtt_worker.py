@@ -19,17 +19,20 @@ class MqttWorker:
     self.system_ready = system_ready
 
     # Config properties
-    self.topic = self.config['topic'].replace(" ", "/").lower() if self.config['topic'] is not None else 'mudpi/mqtt/'
+    self.topic = self.config['topic'].replace(" ", "/").lower() if self.config['topic'] is not None else 'mudpi/mqtt/*'
     self.broker = self.config['broker'] if self.config['broker'] is not None else '127.0.0.1'
     self.port = self.config['port'] if self.config['port'] is not None else '1883'
     self.name = self.config['name'] if self.config['name'] is not None else 'MudPi'
+    
     self.mqtt_topic = self.config['mqtt_topic'] if self.config['mqtt_topic'] is not None else '/'
+    if self.mqtt_topic[-1] != '/':
+      self.mqtt_topic += '/'
     self.username = self.config['username'] if self.config['username'] is not None else ''
     self.password = self.config['password'] if self.config['password'] is not None else ''
 
     # Pubsub Listeners
-		self.pubsub = variables.r.pubsub()
-		self.pubsub.subscribe(**{self.topic: self.handlePublish})
+		self.pubsub = variables.r.pubsub(ignore_subscribe_messages=True)
+		self.pubsub.psubscribe(**{self.topic: self.handlePublish})
 
 		self.init()
 
@@ -47,11 +50,14 @@ class MqttWorker:
     return t
 
   def handlePublish(self, message):
-    self.client.publish(self.mqtt_topic, payload=message)
-    print('MQTT Worker...\t\t\t\033[1;32m Publishing message: ' + message + '\033[0;0m')
+    topic = self.mqtt_topic + message['channel'][len(self.topic):]
+    self.client.publish(topic, payload=message['data'])
+    print('MQTT Worker...\t\t\t\033[1;32m Publishing message \"' + message['data'] + '\" on MQTT topic \"' + topic + '\033[0;0m')
   
   def handleSubscribe(client, userdata, message):
-    pass
+    topic = self.topic[:-1] + message.topic[(len(self.mqtt_topic) - 1):]
+    self.pubsub.publish(topic, message.payload)
+    print('MQTT Worker...\t\t\t\033[1;32m Publishing message \"' + message.payload + '\" on Redis topic \"' + topic + '\033[0;0m')
 
 	def elapsedTime(self):
 		self.time_elapsed = time.perf_counter() - self.time_start
