@@ -89,8 +89,7 @@ try:
 
 	threads = []
 	actions = {}
-	relays = []
-	relayEvents = {}
+	relays = {}
 	relay_index = 0
 	variables.lcd_message = {'line_1': 'Mudpi Control', 'line_2': 'Is Now Running'}
 
@@ -99,6 +98,9 @@ try:
 	system_ready = threading.Event() #Event to tell workers to begin working
 	camera_available = threading.Event() #Event to signal if camera can be used
 	main_thread_running.set() #Main event to tell workers to run/shutdown
+
+	pubsub = variables.r.pubsub()
+	pubsub.psubscribe(CONFIGS['central_topic'] if 'central_topic' in CONFIGS else 'mudpi/control/central/')
 
 	time.sleep(0.1)
 	print('Preparing Threads for Workers...\t\033[1;32m Complete\033[0;0m')
@@ -150,7 +152,11 @@ try:
 				"active": threading.Event() #Event to signal relay to open/close
 			}
 			#Store the relays under the key or index if no key is found, this way we can reference the right relays
-			relayEvents[relay.get("key", relay_index)] = relayState
+			relays = {}
+			group = relay.get("group", "common") 
+			if group not in relays:
+				relays[group] = {}
+			relayEvents[group][relay.get("key", relay_index)] = relayState
 			#Create sensor worker for a relay
 			r = RelayWorker(relay, main_thread_running, system_ready, relayState['available'], relayState['active'])
 			r = r.run()
@@ -244,6 +250,15 @@ try:
 	while PROGRAM_RUNNING:
 		# Main program loop
 		# add logging or other system operations here...
+		message = pubsub.get_message()
+		if message:
+			if message['data'][:4] == 'dis_':
+				group = message['data'][4:]
+				relay['available'].clear() for relay in relays[group] if group in relays
+			elif message['data'][:4] == 'ena_':
+				group = message['data'][4:]
+				relay['available'].set() for relay in relays[group] if group in relays
+				
 		time.sleep(0.1)
 
 except KeyboardInterrupt:

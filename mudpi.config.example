@@ -1,5 +1,6 @@
 {
     "name": "MudPi",
+    "central_topic": "mudpi/control/central/"
     "debug": false,
     "server": {
         "host": "127.0.0.1",
