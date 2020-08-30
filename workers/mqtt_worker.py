@@ -30,10 +30,10 @@ class MqttWorker:
     self.password = self.config['password'] if self.config['password'] is not None else ''
 
     # Pubsub Listeners
-		self.pubsub = variables.r.pubsub()
-		self.pubsub.subscribe(**{self.topic_subscribe: self.handlePublish})
+    self.pubsub = variables.r.pubsub()
+    self.pubsub.subscribe(**{self.topic_subscribe: self.handlePublish})
 
-		self.init()
+    self.init()
 
   def init(self):
     self.client = mqtt.Client(self.name)
@@ -58,12 +58,12 @@ class MqttWorker:
     self.pubsub.publish(topic, message.payload)
     print('MQTT Worker...\t\t\t\033[1;32m Publishing message \"' + message.payload + '\" on Redis topic \"' + topic + '\033[0;0m')
 
-	def elapsedTime(self):
-		self.time_elapsed = time.perf_counter() - self.time_start
-		return self.time_elapsed
+  def elapsedTime(self):
+    self.time_elapsed = time.perf_counter() - self.time_start
+    return self.time_elapsed
 
-	def resetElapsedTime(self):
-		self.time_start = time.perf_counter()
+  def resetElapsedTime(self):
+    self.time_start = time.perf_counter()
 
   def work(self):
     self.resetElapsedTime();
