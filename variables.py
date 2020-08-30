@@ -1,5 +1,7 @@
 import redis
+import logging
 
+LOGGER = logging.getLogger('mudpi')
 lcd_message = {'line_1': 'Temperature: ', 'line_2': 'Humidity: '}
 PREVIOUS_LINE="\x1b[1F"
 RED_BACK="\x1b[41;37m"

@@ -5,6 +5,7 @@ import json
 import redis
 import threading
 import sys
+import traceback
 sys.path.append('..')
 
 import variables
@@ -45,6 +46,7 @@ class MqttWorker:
   def run(self):
     t = threading.Thread(target=self.work, args=())
     t.start()
+    variables.LOGGER.info("MQTT worker running")
     print('MQTT Worker...\t\t\t\033[1;32m Running\033[0;0m')
     return t
 
@@ -74,7 +76,9 @@ class MqttWorker:
           self.pubsub.get_message()
           self.client.loop(timeout=0.5)
         except:
+          variables.LOGGER.error("MQTT worker unexpected error: " + traceback.format_exc())
           print("MQTT Worker \t\033[1;31m Unexpected Error\033[0;0m")
+          traceback.print_exc()
       
       else:
           self.resetElapsedTime()
@@ -82,5 +86,6 @@ class MqttWorker:
       time.sleep(0.1)
 
     self.pubsub.close()
+    variables.LOGGER.info("MQTT worker shutting down")
     print("MQTT Worker Shutting Down...\t\033[1;32m Complete\033[0;0m")
     

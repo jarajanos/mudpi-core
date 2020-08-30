@@ -49,15 +49,18 @@ class RelayWorker():
 		if(self.config.get('restore_last_known_state', None) is not None and self.config.get('restore_last_known_state', False) is True):
 			if(variables.r.get(self.config['key']+'_state')):
 				GPIO.output(self.config['pin'], self.pin_state_on)
-				print('Restoring Relay \033[1;36m{0} On\033[0;0m'.format(self.config['key']))
+				variables.LOGGER.info("Restoring Relay {key}".format(**self.config))
+				print('Restoring Relay \033[1;36m{key} On\033[0;0m'.format(**self.config))
 
 
+		variables.LOGGER("Relay Worker {key} ready".format(**self.config))
 		print('Relay Worker {key}...\t\t\t\033[1;32m Ready\033[0;0m'.format(**self.config))
 		return
 
 	def run(self): 
 		t = threading.Thread(target=self.work, args=())
 		t.start()
+		variables.LOGGER.info('Relay Worker {key} running'.format(**self.config))
 		print('Relay Worker {key}...\t\t\t\033[1;32m Running\033[0;0m'.format(**self.config))
 		return t
 
@@ -96,6 +99,7 @@ class RelayWorker():
 						self.relay_active.set()
 					print('Toggle Relay \033[1;36m{0} {1} \033[0;0m'.format(self.config['key'], state))
 			except:
+				variables.LOGGER.error('Error Decoding message for Relay {key}'.format(**self.config))
 				print('Error Decoding Message for Relay {0}'.format(self.config['key']))
 
 	def elapsedTime(self):
@@ -117,6 +121,7 @@ class RelayWorker():
 				self.active = True
 				#self.relay_active.set() This is handled by the redis listener now
 				self.resetElapsedTime()	
+				variables.LOGGER.debug("Relay {key} turned ON".format(**self.config))
 
 	def turnOff(self):
 		#Turn off volkeye to flip off relay
@@ -129,6 +134,7 @@ class RelayWorker():
 				#self.relay_active.clear() This is handled by the redis listener now
 				self.active = False
 				self.resetElapsedTime()
+				variables.LOGGER.debug("Relay {key} turned OFF".format(**self.config))
 
 	def work(self):
 		self.resetElapsedTime()
@@ -146,6 +152,7 @@ class RelayWorker():
 						self.turnOff()
 						time.sleep(1)
 				except:
+					variables.LOGGER.error("Unexpected error in Relay worker {key}".format(**self.config))
 					print("Relay Worker \033[1;36m{key}\033[0;0m \t\033[1;31m Unexpected Error\033[0;0m".format(**self.config))
 
 			else:
@@ -160,4 +167,5 @@ class RelayWorker():
 		#This is only ran after the main thread is shut down
 		#Close the pubsub connection
 		self.pubsub.close()
+		variables.LOGGER.info("Relay Worker {key} shutting down".format(**self.config))
 		print("Relay Worker {key} Shutting Down...\t\033[1;32m Complete\033[0;0m".format(**self.config))
