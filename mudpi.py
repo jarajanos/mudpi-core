@@ -214,7 +214,7 @@ try:
 			if t is not None:
 				threads.append(t)
 	except KeyError as e:
-		varibales.LOGGER.warning('Invalid or no Nodes found to Load: ' + traceback.format_exc())
+		variables.LOGGER.warning('Invalid or no Nodes found to Load: ' + traceback.format_exc())
 		print('Invalid or no Nodes found to Load')
 		traceback.print_exc()
 

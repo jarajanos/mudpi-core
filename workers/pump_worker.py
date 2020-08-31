@@ -30,12 +30,14 @@ class PumpWorker():
 		GPIO.setup(self.config['pin'], GPIO.OUT)
 		#Close the relay by default
 		GPIO.output(self.config['pin'], GPIO.HIGH)
+		variables.LOGGER.info("Pump worker ready")
 		print('Pump Worker...\t\t\t\t\033[1;32m Ready\033[0;0m')
 		return
 
 	def run(self): 
 		t = threading.Thread(target=self.work, args=())
 		t.start()
+		variables.LOGGER.info("Pump worker running")
 		print('Pump Worker...\t\t\t\t\033[1;32m Running\033[0;0m')
 		return t
 
@@ -68,6 +70,7 @@ class PumpWorker():
 			variables.r.set('last_watered_at', datetime.datetime.now()) #Store current time to track watering times
 			self.pump_running = True
 		self.resetElapsedTime()
+		variables.LOGGER.info("Pump turning ON")
 		print('Pump Turning On!')
 
 	def turnPumpOff(self):
@@ -79,6 +82,7 @@ class PumpWorker():
 			variables.r.delete('pump_running', False)
 			variables.r.publish('pump', json.dumps(message))
 			self.pump_running = False
+			variables.LOGGER.info("Pump turning OFF")
 			print('Pump Turning Off!')
 
 	def work(self):
@@ -106,4 +110,5 @@ class PumpWorker():
 				
 			time.sleep(5)
 		#This is only ran after the main thread is shut down
+		variables.LOGGER.info("Pump worker shutting down")
 		print("Pump Worker Shutting Down...\t\t\033[1;32m Complete\033[0;0m")

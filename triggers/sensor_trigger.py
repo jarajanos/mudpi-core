@@ -2,6 +2,7 @@ import time
 import json
 import redis
 import sys
+import traceback
 from .trigger import Trigger
 sys.path.append('..')
 import variables
@@ -49,6 +50,7 @@ class SensorTrigger(Trigger):
 					else:
 						self.trigger_active.clear()
 			except:
+				variables.LOGGER.error('Error Triggering Actions for {0}: '.format(self.name) + traceback.format_exc())
 				print('Error Triggering Actions for {0}'.format(self.name))
 		self.previous_state = self.trigger_active.is_set()
 

@@ -2,6 +2,7 @@ import time
 import json
 import redis
 import sys
+import traceback
 from .trigger import Trigger
 try:
 	import pycron
@@ -34,8 +35,10 @@ class TimeTrigger(Trigger):
 						else:
 							self.trigger_active.clear()
 					else:
+						variables.LOGGER.error("Pycron not found while setting up time trigger")
 						print("Error pycron not found.")
 				except:
+					variables.LOGGER.error("Error evaluating time trigger schedule: " + traceback.format_exc())
 					print("Error evaluating time trigger schedule.")
 				time.sleep(self.trigger_interval)
 			else:

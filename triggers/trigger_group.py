@@ -51,6 +51,7 @@ class TriggerGroup():
 			else:
 				self.trigger_count = 0
 		except Exception as e:
+			variables.LOGGER.error("Error triggering group {0} ".format(self.key) + e.msg)
 			print("Error triggering group {0} ".format(self.key), e)
 			pass
 		return

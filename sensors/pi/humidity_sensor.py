@@ -41,6 +41,7 @@ class HumiditySensor(Sensor):
 			variables.r.set(self.key + '_humidity', humidity)
 			readings = {'temperature': round(temperature * 1.8 + 32, 2), 'humidity': humidity}
 			variables.r.set(self.key, json.dumps(readings))
+			variables.LOGGER.debug("Pi temperature sensor reading: {0}".format(readings))
 			print('Pi Temp:', readings)
 			return readings
 		else:

@@ -2,6 +2,7 @@ import socket
 import sys
 import threading
 import pickle
+import variables
 
 # A socket server prototype that was going to be used for devices to communicate.
 # Instead we are using nodejs to catch events in redis and emit them over a socket.
@@ -19,6 +20,7 @@ class MudpiServer(object):
 		try:
 			self.sock.bind((self.host, self.port))
 		except socket.error as msg:
+			variables.LOGGER.error('Failed to create socket. Error Code: ', str(msg[0]), ' , Error Message: ', msg[1])
 			print('Failed to create socket. Error Code: ', str(msg[0]), ' , Error Message: ', msg[1])
 			sys.exit()
 
@@ -29,12 +31,14 @@ class MudpiServer(object):
 			try:
 				client, address = self.sock.accept()
 				client.settimeout(60)
+				variables.LOGGER.info('Client connected from ' + address)
 				print('Client connected from ', address)
 				t = threading.Thread(target = self.listenToClient, args = (client, address))
 				self.client_threads.append(t)
 				t.start()
 			except:
 				pass
+		variables.LOGGER.info("Server shutting down")
 		print('Server Shutdown...\r', end="", flush=True)
 		self.sock.close()
 		print('Server Shutdown...\t\t\t\033[1;32m Complete\033[0;0m')
@@ -53,6 +57,7 @@ class MudpiServer(object):
 			except:
 				client.close()
 				return false
+		variables.LOGGER.info("Closing client connection")
 		print('Closing Client Connection...\t\t\033[1;32m Complete\033[0;0m')
 
 if __name__ == "__main__":

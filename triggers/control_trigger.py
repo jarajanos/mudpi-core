@@ -2,6 +2,7 @@ import time
 import json
 import redis
 import sys
+import traceback
 from .trigger import Trigger
 sys.path.append('..')
 import variables
@@ -48,6 +49,7 @@ class ControlTrigger(Trigger):
 					else:
 						self.trigger_active.clear()
 			except:
+				variables.LOGGER.error("Error during trigger actions {0}: ".format(self.key) + traceback.format_exc())
 				print('Error During Trigger Actions {0}'.format(self.key))
 		self.previous_state = self.trigger_active.is_set()
 

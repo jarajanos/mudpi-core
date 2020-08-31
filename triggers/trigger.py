@@ -49,6 +49,7 @@ class Trigger():
 			else:
 				self.group.trigger()
 		except Exception as e:
+			variables.LOGGER.error("Error triggering action {0} ".format(self.key) + e.msg)
 			print("Error triggering action {0} ".format(self.key), e)
 			pass
 		return

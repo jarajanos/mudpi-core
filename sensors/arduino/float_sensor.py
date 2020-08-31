@@ -38,10 +38,12 @@ if __name__ == '__main__':
 		while (loop_count > 0):
 			sensor = FloatSensor(9)
 			rainread = sensor.read()
+			variables.LOGGER.debug("Float sensor reading: {0}".format(rainread))
 			print('Float: ', rainread)
 			loop_count += 1
 			time.sleep(3)
 	except KeyboardInterrupt:
 		pass
 	finally:
-		print('Float Sensor Closing...')
+		variables.LOGGER.info("Float sensor shutting down")
+		print('Float Sensor Shutting down...')
