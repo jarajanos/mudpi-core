@@ -8,6 +8,7 @@ RED_BACK="\x1b[41;37m"
 GREEN_BACK="\x1b[42;30m"
 YELLOW_BACK="\x1b[43;30m"
 RESET="\x1b[0m"
+LOW_CURRENT = 'low_current'
 
 #Singleton redis to prevent connection conflicts
 r = redis.Redis(host='127.0.0.1', port=6379)
